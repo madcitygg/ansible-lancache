@@ -1,0 +1,64 @@
+---
+timezone: 'Etc/UTC'
+
+network:
+  interface: em1
+  address: 192.168.1.61
+  netmask: 255.255.255.0
+  gateway: 192.168.1.1
+  # broadcast: 192.168.3.255
+  # dns_nameservers: 8.8.8.8 8.8.4.4
+
+dirs:
+  log: /var/log/lancache
+  cache: /var/lib/lancache
+
+nginx:
+  version: nginx-1.13.9
+  resolver: "8.8.8.8 4.2.2.2 ipv6=off"
+
+cache_defaults:
+  keys_zone: "500m"
+  inactive: "120d"
+  levels: "2:2"
+  loader_files: "1000"
+  loader_sleep: "50ms"
+  loader_threshold: "300ms"
+  max_size: "50000m"  # 50 gb
+
+caches:
+  steam:
+    address: 192.168.1.81
+    max_size: "900000m"  # 900 gb
+  riot:
+    address: 192.168.1.82
+  blizzard:
+    address: 192.168.1.83
+  hirez:
+    address: 192.168.1.84
+  origin:
+    address: 192.168.1.85
+  sony:
+    address: 192.168.1.86
+  microsoft:
+    address: 192.168.1.87
+  enmasse:
+    address: 192.168.1.88
+  gog:
+    address: 192.168.1.89
+  arenanetworks:
+    address: 192.168.1.90
+  apple:
+    address: 192.168.1.91
+  wargaming:
+    address: 192.168.1.92
+  uplay:
+    address: 192.168.1.93
+  glyph:
+    address: 192.168.1.94
+  zenimax:
+    address: 192.168.1.95
+  digitalextremes:
+    address: 192.168.1.96
+  pearlabyss:
+    address: 192.168.1.97
