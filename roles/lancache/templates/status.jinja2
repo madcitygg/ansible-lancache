@@ -1,0 +1,11 @@
+server {
+    listen {{ network.address }}:{{ status_http_port|default(80) }};
+    server_name localhost;
+
+    allow 127.0.0.1;
+    deny all;
+
+    location / {
+        stub_status;
+    }
+}

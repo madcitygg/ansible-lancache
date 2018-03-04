@@ -1,0 +1,98 @@
+---
+# Apt cache
+- name: update apt cache
+  apt:
+    update_cache: yes
+    cache_valid_time: 3600
+
+# Fix some common settings
+- name: fix locale
+  copy:
+    src: locale
+    dest: /etc/default/locale
+  tags: locale
+
+- name: set timezone
+  template:
+    src: timezone.jinja2
+    dest: /etc/timezone
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - update timezone
+  tags:
+    - timezone
+
+# Install requirements for playbooks
+- name: install common playbook requirements
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - python-software-properties
+
+# Install utils you always need
+- name: install common utils
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - curl
+    - wget
+    - vim
+    - htop
+    - unzip
+    - libcurl4-openssl-dev
+
+# Remove stuff you never need
+- name: remove stuff we don't use
+  apt:
+    name: "{{ item }}"
+    state: absent
+    purge: yes
+  with_items:
+    - whoopsie
+    - at
+
+# Enable unattended upgrades
+- name: install unattended upgrades
+  apt:
+    name: unattended-upgrades
+    state: present
+  tags: unattended-upgrades
+
+- name: enable unattended upgrades
+  copy:
+    src: 10periodic
+    dest: /etc/apt/apt.conf.d/10periodic
+  tags: unattended-upgrades
+
+# Make sure ntp is installed and activated
+- name: install ntp
+  apt:
+    name: ntp
+    state: present
+  tags: ntp
+
+- name: start ntp service
+  service:
+    name: ntp
+    state: started
+    enabled: true
+  tags: ntp
+
+# Ignore power button
+- name: ignore power button when on
+  lineinfile:
+    dest: /etc/systemd/logind.conf
+    regexp: "^HandlePowerKey=ignore"
+    line: "HandlePowerKey=ignore"
+    state: present
+  register: logindconf
+
+- name: restart logind
+  service:
+    name: systemd-logind
+    state: restarted
+  when: logindconf.changed

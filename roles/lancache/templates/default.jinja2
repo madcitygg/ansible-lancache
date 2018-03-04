@@ -1,0 +1,25 @@
+server_names_hash_bucket_size 64;
+
+server {
+    listen {{ network.address }}:{{ default_http_port|default(80) }} default_server;
+    listen [::]:{{ default_http_port|default(80) }} default_server ipv6only=on;
+
+    location /status {
+        stub_status;
+    }
+
+    location / {
+        return 444;
+    }
+}
+
+server {
+    listen {{ default_https_port|default(443) }} default_server;
+    listen [::]:{{ default_https_port|default(443) }} default_server ipv6only=on;
+
+    ssl on;
+    ssl_certificate /etc/ssl/certs/ssl-cert-snakeoil.pem;
+    ssl_certificate_key /etc/ssl/private/ssl-cert-snakeoil.key;
+
+    return 444;
+}
