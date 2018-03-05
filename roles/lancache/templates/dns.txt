@@ -1,0 +1,6 @@
+{% for key, cache in caches.items() %}
+    {{ key }}
+    {% for host in cache.hosts %}
+        {{ host }} -> {{ network.host }}
+    {% endfor %}
+{% endfor %}

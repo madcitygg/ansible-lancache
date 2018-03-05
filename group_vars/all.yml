@@ -1,17 +1,12 @@
 ---
 timezone: 'Etc/UTC'
 
-network:
-  interface: em1
-  address: 192.168.1.61
-  netmask: 255.255.255.0
-  gateway: 192.168.1.1
-  # broadcast: 192.168.3.255
-  # dns_nameservers: 8.8.8.8 8.8.4.4
-
 dirs:
   log: /var/log/lancache
   cache: /var/lib/lancache
+
+network:
+  host: 192.168.1.70
 
 nginx:
   version: nginx-1.13.9
@@ -28,37 +23,159 @@ cache_defaults:
 
 caches:
   steam:
-    address: 192.168.1.81
     max_size: "900000m"  # 900 gb
+    hosts:
+      - "client-download.steampowered.com"
+      - "content1.steampowered.com"
+      - "content2.steampowered.com"
+      - "content3.steampowered.com"
+      - "content4.steampowered.com"
+      - "content5.steampowered.com"
+      - "content6.steampowered.com"
+      - "content7.steampowered.com"
+      - "content8.steampowered.com"
+      - "cs.steampowered.com"
+      - "clientconfig.akamai.steamtransparent.com"
+      - "hsar.steampowered.com.edgesuite.net"
+      - "steamcontent.com"
+      - "edgecast.steamstatic.com"
+      - "steampipe.akamaized.net"
+      - "steam.apac.qtlglb.com"
+      - "steam.apac.qtlglb.com.mwcloudcdn.com"
+      - "cdn1-sea1.valve.net"
+      - "cdn2-sea1.valve.net"
+
   riot:
-    address: 192.168.1.82
+    hosts:
+      - "l3cdn.riotgames.com"
+      - "riotgamespatcher-a.akamaihd.net"
+      - "riotgamespatcher-a.akamaihd.net.edgesuite.net"
+      - "riotgamespatcher-b.akamaihd.net"
+      - "riotgamespatcher-b.akamaihd.net.edgesuite.net"
+      - "worldwide.l3cdn.riotgames.com"
+
   blizzard:
-    address: 192.168.1.83
+    hosts:
+      - "dist.blizzard.com"
+      - "llnw.blizzard.com"
+      - "level3.blizzard.com"
+      - "dist.blizzard.com.edgesuite.net"
+      - "blzddist1-a.akamaihd.net"
+      - "blzddist2-a.akamaihd.net"
+      - "blzddist1-b.akamaihd.net"
+      - "blzddist2-b.akamaihd.net"
+      - "blzddist3-a.akamaihd.net"
+      - "blzddist3-b.akamaihd.net"
+      - "blizzard.vo.llnwd.net"
+      - "edge.blizzard.top.comcast.net"
+      - "edgecast.blizzard.com"
+      - "nydus.battle.net"
+
   hirez:
-    address: 192.168.1.84
+    hosts:
+      - "hirez.http.internapcdn.net"
+
   origin:
-    address: 192.168.1.85
+    hosts:
+      - "akamai.cdn.ea.com"
+      - "download.origin.com"
+      - "origin-a.akamaihd.net"
+      - "lvlt.cdn.ea.com"
+      - "origin-b.akamaihd.net"
+      - "river.data.ea.com"
+
   sony:
-    address: 192.168.1.86
+    hosts:
+      - "pls.patch.station.sony.com"
+      - "gs2.ww.prod.dl.playstation.net"
+      - "gs2.sonycoment.loris-e.llnwd.net"
+
   microsoft:
-    address: 192.168.1.87
+    hosts:
+      - "windowsupdate.com"
+      - "dlassets.xboxlive.com"
+      - "msxbassets.loris.llnwd.net"
+      - "xboxone.loris.llnwd.net"
+      - "xboxone.vo.llnwd.net"
+      - "images-eds.xboxlive.com"
+      - "xbox-mbr.xboxlive.com"
+      - "assets1.xboxlive.com.nsatc.net"
+      - "assets1.xboxlive.com"
+      - "assets2.xboxlive.com"
+      - "fullproduct.download.microsoft.com"
+
   enmasse:
-    address: 192.168.1.88
+    hosts:
+      - "patch.tera.enmasse-game.com"
+      - "patch.closers.enmasse-game.com"
+      - "download.enmasse.com"
+
   gog:
-    address: 192.168.1.89
+    hosts:
+      - "cdn.gog.com"
+      - "wpc.11df.deltacdn.net"
+      - "11df-eu-lb.wpc.edgecastcdn.net"
+      - "11df-eu-lb.apr-11df.edgecastdns.net"
+
   arenanetworks:
-    address: 192.168.1.90
+    hosts:
+      - "assetcdn.101.arenanetworks.com"
+      - "assetcdn.102.arenanetworks.com"
+      - "assetcdn.103.arenanetworks.com"
+      - "live.patcher.bladeandsoul.com"
+
   apple:
-    address: 192.168.1.91
+    hosts:
+      - "mzstatic.com"
+      - "swcdn.apple.com"
+      - "itunes-apple.com"
+      - "swscan.apple.com"
+      - "osxapps.itunes.apple.com"
+
   wargaming:
-    address: 192.168.1.92
+    hosts:
+      - "wg.gcdn.co"
+      - "wargaming.net.edgesuite.net"
+      - "wgusst-na.wargaming.net"
+      - "wgusst-eu.wargaming.net"
+      - "update-v4r4h10x.worldofwarships.com"
+      - "static-sguscs.worldofwarships.com"
+      - "dl2.wargaming.net"
+      - "dl-wows-ak.wargaming.net"
+      - "dl-wows-cdx.wargaming.net"
+      - "dl-wows-gc.wargaming.net"
+      - "dl-wot-cdx.wargaming.net"
+      - "dl-wot-gc.wargaming.net"
+      - "dl-wowp-cdx.wargaming.net"
+      - "dl-wowp-gc.wargaming.net"
+      - "wguswgc-na.wargaming.net"
+      - "wguscs-wotcom.wargaming.net"
+      - "wguscs-twaeu.wargaming.net"
+      - "dl-twa-gc.wargaming.net"
+    block:
+      - "dht.transmissionbt.com."
+      - "router.utorrent.com."
+      - "router.bitcomet.com."
+      - "dht.aelitis.com."
+      - "torrents.worldoftanks.ru."
+
   uplay:
-    address: 192.168.1.93
+    hosts:
+      - "cdn.ubi.com"
+
   glyph:
-    address: 192.168.1.94
+    hosts:
+      - "aa-update.dyn.triongames.com"
+
   zenimax:
-    address: 192.168.1.95
+    hosts:
+      - "patcher.elderscrollsonline.com"
+
   digitalextremes:
-    address: 192.168.1.96
+    hosts:
+      - "content.warframe.com"
+
   pearlabyss:
-    address: 192.168.1.97
+    hosts:
+      - "akamai-gamecdn.blackdesertonline.com"
+

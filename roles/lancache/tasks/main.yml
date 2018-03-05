@@ -8,6 +8,8 @@
     owner: root
     group: root
     mode: 0755
+  tags:
+    - nginx
   with_items:
     - /etc/nginx
     - /etc/nginx/sites-enabled
@@ -15,27 +17,34 @@
     - /var/log/nginx
 
 - name: install nginx logrotate
-  template:
+  copy:
     src: nginx.logrotate
     dest: /etc/logrotate.d/nginx
     owner: root
     group: root
     mode: 0644
+  tags:
+    - nginx
 
 - name: create lancache log dir
   file:
     path: "{{ dirs.log }}"
     state: directory
     owner: root
+    group: root
     mode: 0755
+  tags:
+    - nginx
 
 - name: create cache log dirs
   file:
-    path: "{{ dirs.log }}/{{ item.key }}"
+    path: "{{ dirs.log }}/{{ item }}"
     state: directory
     owner: root
     mode: 0755
-  with_dict: "{{ caches }}"
+  tags:
+    - nginx
+  with_items: "{{ caches.keys() }}"
 
 - name: create cache tmp dir
   file:
@@ -44,15 +53,19 @@
     owner: www-data
     group: www-data
     mode: 0755
+  tags:
+    - nginx
 
 - name: create cache dirs
   file:
-    path: "{{ dirs.cache }}/{{ item.key }}/"
+    path: "{{ dirs.cache }}/{{ item }}/"
     state: directory
     owner: www-data
     group: www-data
     mode: 0755
-  with_dict: "{{ caches }}"
+  tags:
+    - nginx
+  with_items: "{{ caches.keys() }}"
 
 
 # Install nginx
@@ -62,6 +75,8 @@
     name: "{{ item }}"
     state: present
     update_cache: yes
+  tags:
+    - nginx
   with_items:
     - build-essential
     - ssl-cert
@@ -76,6 +91,8 @@
     url: "http://nginx.org/download/{{ nginx.version }}.tar.gz"
     dest: "/tmp/{{ nginx.version }}.tar.gz"
   register: nginx_source
+  tags:
+    - nginx
 
 - name: unpack nginx
   unarchive:
@@ -84,6 +101,8 @@
     src: "{{ nginx_source.dest }}"
   when: nginx_source.changed
   register: nginx_source_unpack
+  tags:
+    - nginx
 
 - name: configure nginx
   command: >
@@ -102,31 +121,16 @@
     chdir: "/tmp/{{ nginx.version }}"
   when: nginx_source_unpack.changed
   register: nginx_configure
+  tags:
+    - nginx
 
 - name: install nginx
   shell: make && make install
   args:
     chdir: "/tmp/{{ nginx.version }}"
   when: nginx_configure|changed
-
-
-# Network
-
-# - name: create hosts file
-#   template:
-#     src: hosts.jinja2
-#     dest: /etc/hosts
-#     owner: root
-#     group: root
-#     mode: 0644
-
-- name: create interfaces
-  template:
-    src: interfaces.conf.jinja2
-    dest: /etc/network/interfaces
-    owner: root
-    group: root
-    mode: 0644
+  tags:
+    - nginx
 
 
 # Config
@@ -138,25 +142,52 @@
     owner: root
     group: root
     mode: 0644
+  tags:
+    - nginx
   with_items:
     - nginx.conf
     - mime.types
+  notify:
+    - reload nginx
+
+- name: create lancache config dir
+  file:
+    path: "/etc/nginx/lancache"
+    state: directory
+    owner: root
+    group: root
+    mode: 0755
+  tags:
+    - nginx
+
+- name: create lancache configs
+  template:
+    src: "lancache/{{ item }}"
+    dest: "/etc/nginx/lancache/{{ item }}"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - nginx
+  with_items:
     - caches.conf
-    - cache-range.conf
-    - cache-slice.conf
-    - proxy-base.conf
-    - proxy-cache.conf
+    - _cache-range.conf
+    - _cache-slice.conf
+    - _proxy-base.conf
+    - _proxy-cache.conf
   notify:
     - reload nginx
 
 - name: install cache vhosts
   template:
-    src: "vhosts/{{ item.key }}.conf"
-    dest: "/etc/nginx/sites-enabled/{{ item.key }}.conf"
+    src: "vhosts/{{ item }}.conf"
+    dest: "/etc/nginx/sites-enabled/{{ item }}.conf"
     owner: root
     group: root
     mode: 0644
-  with_dict: "{{ caches }}"
+  tags:
+    - nginx
+  with_items: "{{ caches.keys() }}"
   notify:
     - reload nginx
 
@@ -171,18 +202,6 @@
     - nginx
   notify:
     - reload nginx
-
-# - name: install status vhost
-#   template:
-#     src: status.jinja2
-#     dest: /etc/nginx/sites-enabled/status
-#     owner: root
-#     group: root
-#     mode: 0644
-#   tags:
-#     - nginx
-#   notify:
-#     - reload nginx
 
 
 # Firewall
@@ -202,12 +221,14 @@
 # Service
 
 - name: install nginx init
-  template:
+  copy:
     src: nginx.init
     dest: /etc/init.d/nginx
     owner: root
     group: root
     mode: 0755
+  tags:
+    - nginx
 
 - name: enable nginx service
   service:
@@ -220,12 +241,21 @@
 
 # DNS
 
-- name: install unbound conf
+- name: generate some kind of dns conf
+  become: false
   template:
-    src: unbound.conf
-    dest: /etc/unbound/unbound.conf
-    owner: root
-    group: root
-    mode: 0755
+    src: dns.txt
+    dest: ./dns.out
+  delegate_to: localhost
   tags:
     - dns
+
+# - name: install unbound conf
+#   template:
+#     src: unbound.conf
+#     dest: /etc/unbound/unbound.conf
+#     owner: root
+#     group: root
+#     mode: 0755
+#   tags:
+#     - dns

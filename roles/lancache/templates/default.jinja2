@@ -1,7 +1,6 @@
-server_names_hash_bucket_size 64;
 
 server {
-    listen {{ network.address }}:{{ default_http_port|default(80) }} default_server;
+    listen {{ default_http_port|default(80) }} default_server;
     listen [::]:{{ default_http_port|default(80) }} default_server ipv6only=on;
 
     location /status {
