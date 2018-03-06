@@ -54,6 +54,7 @@
   with_items:
     - whoopsie
     - at
+    - snapd
 
 # Enable unattended upgrades
 - name: install unattended upgrades
