@@ -1,16 +1,14 @@
 ---
-- name: set up base system
-  hosts: all
-  become: yes
-  tags:
-    - base
-  roles:
-    - role: base
-
 - name: set up lancache
-  hosts: all
+  hosts: lancache
   become: yes
   tags:
     - lancache
   roles:
     - role: lancache
+
+- name: set up dns
+  hosts: dns
+  become: yes
+  roles:
+    - role: unbound

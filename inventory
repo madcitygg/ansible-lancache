@@ -1,2 +1,3 @@
 #lancache ansible_host=127.0.0.1 ansible_port=2222 ansible_user=ubuntu
-lancache ansible_host=kilgore ansible_port=22 ansible_user=mp
+lancache ansible_host=lancache ansible_port=22 ansible_user=mp
+dns ansible_host=dns ansible_port=22 ansible_user=mp

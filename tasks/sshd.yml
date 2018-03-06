@@ -1,0 +1,13 @@
+---
+# Harden ssh config
+# - name: rewrite sshd config
+#   lineinfile: dest=/etc/ssh/sshd_config regexp='{{ item.regexp }}' line='{{ item.line }}' state=present
+#   with_items:
+#     - { regexp: '^ChallengeResponseAuthentication', line: 'ChallengeResponseAuthentication no' }
+#     - { regexp: '^PermitRootLogin', line: 'PermitRootLogin no' }
+#     - { regexp: '^#?PasswordAuthentication', line: 'PasswordAuthentication no' }
+#   register: sshdconf
+
+# - name: restart sshd
+#   service: name=ssh state=restarted
+#   when: sshdconf.changed

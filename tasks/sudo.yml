@@ -1,0 +1,10 @@
+---
+# Validate the sudoers file before saving
+- name: allow passwordless sudo
+  lineinfile:
+    dest: /etc/sudoers
+    state: present
+    regexp: '^%sudo'
+    line: '%sudo ALL=(ALL) NOPASSWD:ALL'
+    validate: 'visudo -cf %s'
+  tags: sudo

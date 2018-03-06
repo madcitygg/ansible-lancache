@@ -1,0 +1,28 @@
+---
+- name: install unbound
+  apt:
+    package: unbound
+    state: present
+    update_cache: yes
+  tags:
+    - dns
+
+- name: enable unbound service
+  service:
+    name: unbound
+    enabled: yes
+    state: started
+  tags:
+    - dns
+
+- name: create unbound config
+  template:
+    src: unbound.conf
+    dest: /etc/unbound/unbound.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - reload unbound
+  tags:
+    - dns

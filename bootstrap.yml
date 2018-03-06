@@ -1,0 +1,16 @@
+---
+- name: provision users and sshd
+  become: true
+  hosts: all
+  tasks:
+    - include: tasks/sudo.yml
+    - include: tasks/users.yml
+    - include: tasks/sshd.yml
+
+- name: set up base system
+  hosts: all
+  become: yes
+  tags:
+    - base
+  roles:
+    - role: base

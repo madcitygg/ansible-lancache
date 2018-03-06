@@ -1,4 +1,71 @@
 ---
+# Tweak system limits
+- name: increase queue listen size permanently
+  lineinfile:
+    dest: /etc/sysctl.conf
+    regexp: '^net\.core\.somaxconn'
+    line: "net.core.somaxconn={{ system.somaxconn }}"
+  register: sys_somaxconn
+  tags:
+    - system
+
+- name: increase queue listen size now
+  command: sysctl -w net.core.somaxconn={{ system.somaxconn }}
+  when: sys_somaxconn.changed
+  tags:
+    - system
+
+- name: find max open files
+  command: cat /proc/sys/fs/file-max
+  register: file_max
+  tags:
+    - system
+
+- name: increase max files in sysctl
+  lineinfile:
+    dest: /etc/sysctl.conf
+    regexp: '^fs\.file-max'
+    line: "fs.file-max={{ file_max.stdout }}"
+  register: sys_filemax
+  tags:
+    - system
+
+- name: increase max files now
+  command: sysctl -w fs.file-max={{ file_max.stdout }}
+  when: sys_filemax.changed
+  tags:
+    - system
+
+- name: increase security limits
+  template:
+    src: "limits/lancache.conf"
+    dest: "/etc/security/limits.d/lancache.conf"
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - system
+
+# - name: add pam limits
+#   lineinfile:
+#     dest: /etc/pam.d/common-session
+#     regexp: "^session required pam_limits.so$"
+#     line: "session required pam_limits.so"
+#     insertafter: EOF
+#   tags:
+#     - system
+
+- name: set systemd default limit
+  lineinfile:
+    dest: "/etc/systemd/{{ item }}"
+    regexp: '^#?DefaultLimitNOFILE'
+    line: "DefaultLimitNOFILE=infinity"
+  tags:
+    - system
+  with_items:
+    - user.conf
+    - system.conf
+
 # Create directories
 
 - name: create nginx directories
@@ -133,6 +200,28 @@
     - nginx
 
 
+# Set up network interfaces
+
+- name: create interfaces
+  template:
+    src: interfaces.conf
+    dest: /etc/network/interfaces.d/lancache
+    owner: root
+    group: root
+    mode: 0644
+  tags:
+    - network
+
+- name: ensure interfaces are loaded
+  lineinfile:
+    dest: /etc/network/interfaces
+    regexp: '^source /etc/network/interfaces.d/\*'
+    line: "source /etc/network/interfaces.d/*"
+    insertafter: EOF
+  tags:
+    - network
+
+
 # Config
 
 - name: create nginx config
@@ -143,7 +232,7 @@
     group: root
     mode: 0644
   tags:
-    - nginx
+    - configs
   with_items:
     - nginx.conf
     - mime.types
@@ -168,7 +257,7 @@
     group: root
     mode: 0644
   tags:
-    - nginx
+    - configs
   with_items:
     - caches.conf
     - _cache-range.conf
@@ -186,7 +275,7 @@
     group: root
     mode: 0644
   tags:
-    - nginx
+    - configs
   with_items: "{{ caches.keys() }}"
   notify:
     - reload nginx
@@ -230,6 +319,16 @@
   tags:
     - nginx
 
+- name: install nginx default
+  template:
+    src: default/nginx
+    dest: /etc/default/nginx
+    owner: root
+    group: root
+    mode: 0755
+  tags:
+    - nginx
+
 - name: enable nginx service
   service:
     name: nginx
@@ -241,14 +340,14 @@
 
 # DNS
 
-- name: generate some kind of dns conf
-  become: false
-  template:
-    src: dns.txt
-    dest: ./dns.out
-  delegate_to: localhost
-  tags:
-    - dns
+# - name: generate some kind of dns conf
+#   become: false
+#   template:
+#     src: dns.txt
+#     dest: ./dns.out
+#   delegate_to: localhost
+#   tags:
+#     - dns
 
 # - name: install unbound conf
 #   template:
